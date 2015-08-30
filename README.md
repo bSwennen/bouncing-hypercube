@@ -1,3 +1,3 @@
 # bouncing-hypercube
 
-simulates a hypercube of particles attached by string subjected to gravity.
+Simulates a hypercube of particles attached by springs subjected to gravity.
