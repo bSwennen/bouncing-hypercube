@@ -2,15 +2,6 @@ package sMath;
 
 public class Vector {
 
-	// public static double[] add(double[] a, double[] b) {
-	// double[] sum = new double[a.length];
-	//
-	// for (int i = 0; i < a.length; i++)
-	// sum[i] = a[i] + b[i];
-	//
-	// return sum;
-	// }
-
 	public static double[] add(double[]... vectors) {
 		int n = vectors[0].length;
 		double[] result = new double[n];

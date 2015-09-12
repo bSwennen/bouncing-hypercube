@@ -2,10 +2,8 @@ package io;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Properties;
 
 public class Io {
@@ -21,21 +19,6 @@ public class Io {
 			InputStream input = new FileInputStream(path);
 			prop.load(input);
 			input.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void toXml(String path) {
-		OutputStream out;
-
-		try {
-			// "output/propOut.xml"
-			out = new FileOutputStream(path);
-			prop.storeToXML(out, null);
-			out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -85,11 +68,5 @@ public class Io {
 	// array[i] = array[i - 1];
 	//
 	// return array;
-	// }
-
-	// public static void main(String[] args) {
-	// Io io = new Io();
-	// System.out.println(io.getDouble("K"));
-	// System.out.println(Arrays.toString(io.getDoubleArray("GRAVITY")));
 	// }
 }

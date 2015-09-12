@@ -36,10 +36,8 @@ public class Spring {
 	public double[] getForce(Particle particle) {
 		int mult = particle == attachedParticles[0] ? 1 : -1;
 
-		double length = Vector
-				.size(Vector.add(attachedParticles[1].position, Vector.mult(-1, attachedParticles[0].position)));
-
 		double[] forceDir = Vector.add(attachedParticles[1].position, Vector.mult(-1, attachedParticles[0].position));
+		double length = Vector.size(forceDir);
 
 		return Vector.mult(mult * k * (length - l0) / length, forceDir);
 	}

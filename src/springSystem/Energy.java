@@ -3,6 +3,7 @@ package springSystem;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.io.PrintWriter;
 
 import sMath.SMath;
 import utility.History;
@@ -21,8 +22,9 @@ public class Energy {
 	public double totalEnergy;
 	public History totalEnergyHistory;
 	double maxEnergy;
+	PrintWriter writer;
 
-	public Energy(SpringSystem system, Rectangle rectangle) {
+	public Energy(SpringSystem system, Rectangle rectangle, PrintWriter energyWriter) {
 		springSystem = system;
 		drawRectangle = rectangle;
 		int historySize = ((Double) (drawRectangle.getWidth() / drawTimeStep)).intValue();
@@ -31,62 +33,44 @@ public class Energy {
 		gravitationalEnergyHistory = new History(historySize);
 		totalEnergyHistory = new History(historySize);
 		maxEnergy = 0;
+		writer = energyWriter;
+		writer.println("t;kineticEnergy;gravitationalEnergy;elasticEnergy;totalEnergy");
+		// to initialize energies
+		update();
 	}
 
-	private void updateKineticEnergy() {
-		double energy = 0;
-
-		for (Particle particle : springSystem.particles)
-			energy += particle.kineticEnergy();
-
-		kineticEnergy = energy;
-	}
-
-	private void updateElasticEnergy() {
-		double energy = 0;
-
-		for (Spring spring : springSystem.springs)
-			energy += spring.elasticEnergy();
-
-		elasticEnergy = energy;
-	}
-
-	private void updateGravitEnergy() {
-		double energy = 0;
+	public void update() {
 		double[] gravity = springSystem.gravity;
 		double[] lowerWalls = springSystem.lowerWalls;
 		double[] upperWalls = springSystem.upperWalls;
 		int d = gravity.length;
 
+		double kinE = 0;
+		double elastE = 0;
+		double gravE = 0;
+
 		for (Particle particle : springSystem.particles) {
+			kinE += particle.kineticEnergy();
+
 			double factor = 0;
 			for (int i = 0; i < d; i++)
 				if (gravity[i] < 0)
 					factor += Math.abs(gravity[i] * (particle.position[i] - lowerWalls[i]));
-				// factor += gravity[i] * (walls[i][0] - particle.position[i]);
 				else
 					factor += Math.abs(gravity[i] * (upperWalls[i] - particle.position[i]));
-			// factor += gravity[i] * (walls[i][1] - particle.position[i]);
 
-			energy += particle.mass * factor;
+			gravE += particle.mass * factor;
+
 		}
-		gravitationalEnergy = energy;
-	}
+		for (Spring spring : springSystem.springs)
+			elastE += spring.elasticEnergy();
 
-	public void update() {
-		// TODO just one loop through particles here and loop through attached
-		// springs for elastic energy
-		updateKineticEnergy();
-		updateElasticEnergy();
-		updateGravitEnergy();
+		kineticEnergy = kinE;
+		gravitationalEnergy = gravE;
+		elasticEnergy = elastE;
 
 		totalEnergy = kineticEnergy + elasticEnergy + gravitationalEnergy;
 	}
-
-	// public void printEnergies(PrintWriter writer) {
-	// writer.println(kineticEnergy + "," + elasticEnergy + "," +
-	// gravitationalEnergy + "," + totalEnergy);
-	// }
 
 	public void draw(Graphics graphic) {
 		int dotWidth = 5;
@@ -100,10 +84,11 @@ public class Energy {
 
 		double[] energies = { kineticEnergy, elasticEnergy, gravitationalEnergy, totalEnergy };
 		double max = SMath.arrayMax(energies);
+		// this will be 0 at first => divide by zero later
 		if (max > maxEnergy)
 			maxEnergy = max;
 
-		History[] energyHistorys = { kineticEnergyHistory, elasticEnergyHistory, gravitationalEnergyHistory,
+		History[] energyHistories = { kineticEnergyHistory, elasticEnergyHistory, gravitationalEnergyHistory,
 				totalEnergyHistory };
 
 		Color[] colors = { Color.GREEN, Color.RED, Color.BLUE, Color.BLACK };
@@ -111,7 +96,7 @@ public class Energy {
 		for (int i = 0; i < energies.length; i++) {
 			graphic.setColor(colors[i]);
 			int dotY = ((Double) (rectY + rectHeight * (1 - energies[i] / maxEnergy) - dotHeight / 2.)).intValue();
-			History history = energyHistorys[i];
+			History history = energyHistories[i];
 			history.add(dotY);
 
 			double[] histArray = history.getArray();
@@ -120,5 +105,9 @@ public class Energy {
 				graphic.fillOval(dotX, (int) histArray[j], dotWidth, dotHeight);
 			}
 		}
+	}
+
+	public void print(double t) {
+		writer.println(t + ";" + kineticEnergy + ";" + gravitationalEnergy + ";" + elasticEnergy + ";" + totalEnergy);
 	}
 }

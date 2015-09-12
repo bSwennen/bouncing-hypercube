@@ -27,20 +27,16 @@ public class Particle {
 		mass = m;
 	}
 
-	public void print(PrintWriter writer) {
-		// writer.println(position.toString() + "\t" + velocity.toString() +
-		// "\t" +
-		// acceleration.toString());
-		writer.println(
-				Arrays.toString(position) + "\t" + Arrays.toString(velocity) + "\t" + Arrays.toString(acceleration));
+	public void print(PrintWriter writer, double t) {
+		writer.println(t + ";" + Arrays.toString(position) + ";" + Arrays.toString(velocity) + ";"
+				+ Arrays.toString(acceleration));
 	}
 
 	// TODO does this use initial acc?
 	// TODO acc should only exist in this function?
 	public void update(double timeStep, double[] lowerWalls, double[] upperWalls, double[] gravity) {
 		acceleration = getAcceleration(gravity);
-		position = Vector.add(position, Vector.mult(timeStep, velocity),
-				Vector.mult(timeStep * timeStep / 2, acceleration));
+		position = Vector.add(position, Vector.mult(timeStep, velocity), Vector.mult(timeStep * timeStep / 2, acceleration));
 
 		double[] intVelocity = Vector.add(velocity, Vector.mult(timeStep / 2, acceleration));
 
@@ -59,7 +55,7 @@ public class Particle {
 			springForce = Vector.add(springForce, spring.getForce(this));
 
 		double[] springAcc = Vector.mult(1 / mass, springForce);
-
+		
 		return Vector.add(springAcc, gravity);
 	}
 

@@ -29,8 +29,10 @@ public class SpringSystem {
 	public double[] lowerWalls;
 	public int numParticles;
 	Rectangle drawRectangle;
+	PrintWriter writer;
 
-	public SpringSystem(Rectangle systemRectangle, Rectangle energyDrawRectangle) {
+	public SpringSystem(Rectangle systemRectangle, Rectangle energyDrawRectangle, PrintWriter sysWriter,
+			PrintWriter energyWriter) {
 		// TODO use this for wall defaults
 		drawRectangle = systemRectangle;
 		getInput();
@@ -58,7 +60,8 @@ public class SpringSystem {
 				if (spring.attachedParticles[0] == part || spring.attachedParticles[1] == part)
 					part.attachedSprings.add(spring);
 			}
-		energy = new Energy(this, energyDrawRectangle);
+		writer = sysWriter;
+		energy = new Energy(this, energyDrawRectangle, energyWriter);
 	}
 
 	private void getInput() {
@@ -153,9 +156,11 @@ public class SpringSystem {
 	public void run(double runTime) {
 		double start = time;
 		for (; time < start + runTime; time += timeStep) {
-			for (Particle part : particles)
+			for (Particle part : particles) {
+				part.print(writer, time);
 				part.update(timeStep, lowerWalls, upperWalls, gravity);
-
+			}
+			energy.print(time);
 			energy.update();
 		}
 	}
@@ -170,10 +175,5 @@ public class SpringSystem {
 
 	public void drawEnergy(Graphics graphic) {
 		energy.draw(graphic);
-	}
-
-	public void printParticles(PrintWriter partWriter) {
-		for (Particle particle : particles)
-			particle.print(partWriter);
 	}
 }

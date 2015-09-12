@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -62,7 +64,12 @@ public class DrawEngine extends JPanel implements ActionListener {
 
 		setBackground(Color.WHITE);
 		setPreferredSize(new Dimension(xResolution, yResolution));
-		system = new SpringSystem(systemRectangle, energyRectangle);
+		try {
+			system = new SpringSystem(systemRectangle, energyRectangle, new PrintWriter("output/particles.csv"),
+					new PrintWriter("output/energy.csv"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		timer = new Timer(drawTimer, this);
 		timer.start();
 	}
